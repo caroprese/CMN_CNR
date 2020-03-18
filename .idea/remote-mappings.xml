@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteMappingsManager">
+    <list>
+      <list>
+        <remote-mappings server-id="python@317400a0-c4fe-4ca6-a46d-c423d9ba71ca" />
+        <remote-mappings server-id="python@sftp://caroprese@dgx.icar.cnr.it:22/usr/bin/python3">
+          <settings>
+            <list>
+              <mapping local-root="$PROJECT_DIR$/../CMN_original_v2 copy" remote-root="/tmp/pycharm_project_245" />
+            </list>
+          </settings>
+        </remote-mappings>
+      </list>
+    </list>
+  </component>
+</project>
