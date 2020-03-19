@@ -5,7 +5,7 @@ Created on 18/12/18
 
 @author: Maurizio Ferrari Dacrema
 """
-
+import CMN_parameters
 from Base.BaseRecommender import BaseRecommender
 from Base.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
 
@@ -102,8 +102,6 @@ class EvaluatorModelLoss(object):
 class CMN_RecommenderWrapper(BaseRecommender, Incremental_Training_Early_Stopping):
     RECOMMENDER_NAME = "CMN_RecommenderWrapper"
     DEFAULT_TEMP_FILE_FOLDER = './result_experiments/__Temp_CMN_RecommenderWrapper/'
-
-    popularity_array = None
 
     def __init__(self, URM_train):
         super(CMN_RecommenderWrapper, self).__init__(URM_train)
@@ -377,7 +375,7 @@ class CMN_RecommenderWrapper(BaseRecommender, Incremental_Training_Early_Stoppin
             feed = {
                 self.model.input_users: ratings[:, 0],
                 self.model.input_items: ratings[:, 1],
-                self.model.input_positive_items_popularity: CMN_RecommenderWrapper.popularity_array[ratings[:, 1]],
+                self.model.input_positive_items_popularity: CMN_parameters.popularity_array[ratings[:, 1]],
                 self.model.input_items_negative: ratings[:, 2],
                 self.model.input_neighborhoods: pos_neighborhoods,
                 self.model.input_neighborhood_lengths: pos_neighborhood_length,
@@ -385,20 +383,26 @@ class CMN_RecommenderWrapper(BaseRecommender, Incremental_Training_Early_Stoppin
                 self.model.input_neighborhood_lengths_negative: neg_neighborhood_length
             }
             batch_loss, _, positive, negative, positive_items_popularity = self.sess.run([self.model.loss,
-                                                                           self.model.train,
-                                                                           self.model.score,
-                                                                           self.model.negative_output,
-                                                                           self.model.input_positive_items_popularity], feed)
+                                                                                          self.model.train,
+                                                                                          self.model.score,
+                                                                                          self.model.negative_output,
+                                                                                          self.model.input_positive_items_popularity], feed)
 
             # batch_loss, _ = self.sess.run([self.model.loss, self.model.train], feed)
             # print('Luciano > positive:\n', positive)
             # print('Luciano > negative:\n', negative)
-            print("CMN training (current batch) =============================================")
-            print('Luciano > positive items (self.model.input_items):\n', ratings[:, 1])
-            print('Luciano > positive scores (self.model.score):\n', positive)
-            print('Luciano > positive_items_popularity (self.model.positive_items_popularity):\n', positive_items_popularity)
-            print('Luciano > batch_loss:\n', batch_loss)
-            print("==========================================================================")
+
+            verbose = False
+            if verbose:
+                print("CMN training (current batch) =============================================")
+                print('Luciano > users (self.model.input_users):\n', ratings[:, 0])
+                print('Luciano > positive items (self.model.input_items):\n', ratings[:, 1])
+                print('Luciano > negative items (self.model.input_items_negative):\n', ratings[:, 2])
+                print('Luciano > positive scores (self.model.score):\n', positive)
+                print('Luciano > positive_items_popularity (self.model.positive_items_popularity):\n', positive_items_popularity)
+                print('Luciano > batch_loss:\n', batch_loss)
+                print("==========================================================================")
+
             loss.append(batch_loss)
 
             if self.verbose:
@@ -422,7 +426,7 @@ class CMN_RecommenderWrapper(BaseRecommender, Incremental_Training_Early_Stoppin
             feed = {
                 self.model.input_users: example[:, 0],
                 self.model.input_items: example[:, 1],
-                self.model.input_positive_items_popularity: CMN_RecommenderWrapper.popularity_array[example[:, 1]],
+                self.model.input_positive_items_popularity: CMN_parameters.popularity_array[example[:, 1]],
                 self.model.input_items_negative: example[:, 2],
             }
             batch_loss, _ = self.sess.run([self.model.loss, self.model.train], feed)

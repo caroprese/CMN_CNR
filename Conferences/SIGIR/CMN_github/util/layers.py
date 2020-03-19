@@ -8,7 +8,10 @@
 import tensorflow as tf
 import sonnet as snt
 
+import CMN_parameters
 from .helper import GraphKeys, OPTIMIZER
+from math import *
+import numpy as np
 from math import *
 
 
@@ -34,20 +37,26 @@ def _bpr_loss(items, positive, negative, positive_items_popularity, name=None):
     """
 
     with tf.name_scope(name, 'BPRLoss', [items, positive, negative, positive_items_popularity]) as scope:
-        # TODO Luciano: modificare loss
+        # Modified loss =======================================================
+        alpha = CMN_parameters.alpha
+        sigma = CMN_parameters.sigma
+        percentile = CMN_parameters.percentile
 
-        alpha = 1
-        sigma = 1
-        k = 1 / (sigma * sqrt(2 * pi))
+        # print('Luciano > alpha:', alpha)
+        # print('Luciano > sigma:', sigma)
+        # print('Luciano > percentile:', percentile)
+
+        f = 1 / (sigma * sqrt(2 * pi))
 
         gamma = tf.tanh(alpha * positive_items_popularity) + \
-                k * tf.exp(-1 / (2 * (sigma ** 2)) * tf.square(positive_items_popularity))
-        # ========================
+                f * tf.exp(-1 / (2 * (sigma ** 2)) * tf.square(positive_items_popularity - percentile))
 
         difference = positive - negative
         # Numerical stability
         eps = 1e-12
         loss = -tf.log(tf.nn.sigmoid(gamma * difference) + eps)
+        # =====================================================================
+
         return tf.reduce_mean(loss, name=scope)
 
 

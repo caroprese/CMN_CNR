@@ -5,6 +5,7 @@ Created on 22/11/17
 
 @author: Maurizio Ferrari Dacrema
 """
+import CMN_parameters
 from Conferences.SIGIR.CMN_github.util.cmn import CollaborativeMemoryNetwork
 from Conferences.SIGIR.CMN_github.util.gmf import PairwiseGMF
 from Conferences.SIGIR.CMN_github.util.layers import LossLayer
@@ -33,6 +34,17 @@ print('GPU:', tf.test.is_gpu_available())
 
 def get_popularity(matrix):
     return matrix.A.sum(axis=0)
+
+
+def get_percentile(popularity_array, k):
+    # print('Luciano > popularity_array:', popularity_array)
+    sorted_popularity_array = np.sort(popularity_array)
+    index = int(round(popularity_array.shape[0] * k / 100))
+    # print('Luciano > len:', popularity_array.shape[0])
+    # print('Luciano > index:', index)
+    percentile = sorted_popularity_array[index]
+    # print('Luciano > percentile:', percentile)
+    return percentile
 
 
 def read_data_split_and_search_CMN(dataset_name):
@@ -67,9 +79,12 @@ def read_data_split_and_search_CMN(dataset_name):
 
     # popularity = get_popularity(URM_train)
 
-    print('Luciano > popularity of items reported in URM_train:\n', popularity)
+    # print('Luciano > popularity of items reported in URM_train:\n', popularity)
 
-    CMN_RecommenderWrapper.popularity_array = popularity
+    CMN_parameters.popularity_array = popularity
+    CMN_parameters.alpha = 1
+    CMN_parameters.sigma = 1
+    CMN_parameters.percentile = get_percentile(CMN_parameters.popularity_array, 80)
 
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):
