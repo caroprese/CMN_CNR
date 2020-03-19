@@ -381,8 +381,12 @@ class CMN_RecommenderWrapper(BaseRecommender, Incremental_Training_Early_Stoppin
                 self.model.input_neighborhoods_negative: neg_neighborhoods,
                 self.model.input_neighborhood_lengths_negative: neg_neighborhood_length
             }
-            batch_loss, _, positive, negative, popularity = self.sess.run([self.model.loss, self.model.train, self.model.score, self.model.negative_output,
-                                                                           self.model.popularity], feed)
+            batch_loss, _, positive, negative, popularity = self.sess.run([self.model.loss,
+                                                                           self.model.train,
+                                                                           self.model.score,
+                                                                           self.model.negative_output,
+                                                                           self.model.popularity],
+                                                                          feed)
 
             # batch_loss, _ = self.sess.run([self.model.loss, self.model.train], feed)
             # print('Luciano > positive:\n', positive)
