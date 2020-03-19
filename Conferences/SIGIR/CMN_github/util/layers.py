@@ -11,7 +11,8 @@ import sonnet as snt
 from .helper import GraphKeys, OPTIMIZER
 
 
-def _bpr_loss(positive, negative, name=None, popularity=None):
+# def _bpr_loss(positive, negative, name=None, popularity=None):
+def _bpr_loss(items, positive, negative, popularity, name=None):
     r"""
     Pairwise Loss from Bayesian Personalized Ranking.
 
@@ -31,20 +32,23 @@ def _bpr_loss(positive, negative, name=None, popularity=None):
     :returns: mean loss
     """
 
-    with tf.name_scope(name, 'BPRLoss', [positive, negative]) as scope:
+    with tf.name_scope(name, 'BPRLoss', [items, positive, negative, popularity]) as scope:
         # TODO Luciano: modificare loss
 
         print('Luciano > The Popularity Array is now available in the Loss Layer!')
         print('type(popularity):', type(popularity))
         print('popularity.shape:', popularity.shape)
         print('popularity:', popularity)
-        print('positive.shape:',positive.shape)
+        print('positive.shape:', positive.shape)
         print('negative.shape:', negative.shape)
+
+        positive_items_popularity = tf.gather_nd(popularity, items)
+
         '''
         alpha = 1
         sigma = 1
 
-        popularity_tensor = tf.constant(popularity)
+        
 
         gamma = tf.tanh(alpha * popularity[popularity_tensor])
         '''
@@ -60,8 +64,6 @@ class LossLayer(snt.AbstractModule):
     Loss Function Wrapper. Applies regularization from GraphKeys.REGULARIZATION_LOSSES
     """
 
-    popularity = None
-
     def __init__(self, name='Loss'):
         """
         Wrapper Function for loss with l1/l2 regularization
@@ -71,16 +73,17 @@ class LossLayer(snt.AbstractModule):
         """
         super(LossLayer, self).__init__(name=name)
 
-    def _build(self, X, y):
+    def _build(self, positive_items, positive_scores, negative_scores, popularity):
         """
 
-        :param X: predicted value
-        :param y: ground truth
+        :param positive_scores: predicted value
+        :param negative_scores: ground truth
         :returns: Loss with l1/l2 regularization added if in keys
         """
+
         graph_regularizers = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
 
-        self._loss = tf.squeeze(_bpr_loss(X, y, "loss_name", LossLayer.popularity))
+        self._loss = tf.squeeze(_bpr_loss(positive_items, positive_scores, negative_scores, popularity))
 
         self._regularization = None
         self._loss_no_regularization = self._loss

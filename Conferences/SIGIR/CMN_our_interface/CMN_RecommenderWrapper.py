@@ -371,6 +371,7 @@ class CMN_RecommenderWrapper(BaseRecommender, Incremental_Training_Early_Stoppin
         for k, example in progress:
             ratings, pos_neighborhoods, pos_neighborhood_length, \
             neg_neighborhoods, neg_neighborhood_length = example
+            # print('Luciano > ratings:\n', ratings)
             feed = {
                 self.model.input_users: ratings[:, 0],
                 self.model.input_items: ratings[:, 1],
@@ -380,7 +381,18 @@ class CMN_RecommenderWrapper(BaseRecommender, Incremental_Training_Early_Stoppin
                 self.model.input_neighborhoods_negative: neg_neighborhoods,
                 self.model.input_neighborhood_lengths_negative: neg_neighborhood_length
             }
-            batch_loss, _ = self.sess.run([self.model.loss, self.model.train], feed)
+            batch_loss, _, positive, negative, popularity = self.sess.run([self.model.loss, self.model.train, self.model.score, self.model.negative_output,
+                                                                           self.model.popularity], feed)
+
+            # batch_loss, _ = self.sess.run([self.model.loss, self.model.train], feed)
+            # print('Luciano > positive:\n', positive)
+            # print('Luciano > negative:\n', negative)
+            print("CMN training (current batch) =============================================")
+            print('Luciano > positive items (self.model.input_items):\n', ratings[:, 1])
+            print('Luciano > positive scores (self.model.score):\n', positive)
+            print('Luciano > popularity (self.model.popularity):\n', popularity)
+            print('Luciano > batch_loss:\n', batch_loss)
+            print("==========================================================================")
             loss.append(batch_loss)
 
             if self.verbose:
@@ -407,6 +419,7 @@ class CMN_RecommenderWrapper(BaseRecommender, Incremental_Training_Early_Stoppin
                 self.model.input_items_negative: example[:, 2],
             }
             batch_loss, _ = self.sess.run([self.model.loss, self.model.train], feed)
+
             loss.append(batch_loss)
 
             if self.verbose:

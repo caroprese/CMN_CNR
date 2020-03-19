@@ -6,6 +6,7 @@ from Conferences.SIGIR.CMN_github.util.layers import DenseLayer, LossLayer, Opti
 
 
 class PairwiseGMF(ModelBase):
+    popularity_array = None
 
     def __init__(self, config):
         """
@@ -40,16 +41,16 @@ class PairwiseGMF(ModelBase):
         """
         Construct the model; main part of it goes here
         """
+        self.popularity = tf.constant(PairwiseGMF.popularity_array)
 
         self.v = DenseLayer(1, False, tf.nn.relu, initializers=self._initializers,
                             regularizers=self._regularizers, name='OutputVector')
         self.score = tf.squeeze(self.v(self._cur_user * self._cur_item))
-        negative_output = tf.squeeze(self.v(self._cur_user * self._cur_item_negative))
+        self.negative_output = tf.squeeze(self.v(self._cur_user * self._cur_item_negative))
         tf.add_to_collection(GraphKeys.PREDICTION, self.score)
-        self.loss = LossLayer()(self.score, negative_output)
+        self.loss = LossLayer()(self.input_items, self.score, self.negative_output, self.popularity)
 
-        self._optimizer = OptimizerLayer(self.config.optimizer, clip=5.0,
-                                         params={})
+        self._optimizer = OptimizerLayer(self.config.optimizer, clip=5.0, params={})
         self.train = self._optimizer(self.loss)
 
     def _construct_weights(self):

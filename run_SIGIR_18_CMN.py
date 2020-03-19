@@ -5,6 +5,8 @@ Created on 22/11/17
 
 @author: Maurizio Ferrari Dacrema
 """
+from Conferences.SIGIR.CMN_github.util.cmn import CollaborativeMemoryNetwork
+from Conferences.SIGIR.CMN_github.util.gmf import PairwiseGMF
 from Conferences.SIGIR.CMN_github.util.layers import LossLayer
 from Recommender_import_list import *
 from Conferences.SIGIR.CMN_our_interface.CMN_RecommenderWrapper import CMN_RecommenderWrapper
@@ -54,7 +56,7 @@ def read_data_split_and_search_CMN(dataset_name):
     URM_test = dataset.URM_test.copy()
     URM_test_negative = dataset.URM_test_negative.copy()
 
-    p = 5
+    p = 20
 
     URM_train = URM_train[:p, :]
     URM_validation = URM_validation[:p, :]
@@ -62,7 +64,11 @@ def read_data_split_and_search_CMN(dataset_name):
     URM_test_negative = URM_test_negative[:p, :]
 
     popularity = get_popularity(URM_train)
-    LossLayer.popularity = popularity
+
+    print('Luciano > popularity of items reported in URM_train:\n', popularity)
+
+    CollaborativeMemoryNetwork.popularity_array = popularity
+    PairwiseGMF.popularity_array = popularity
 
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):

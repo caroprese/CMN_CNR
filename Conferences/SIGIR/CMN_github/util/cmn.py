@@ -6,6 +6,7 @@ from Conferences.SIGIR.CMN_github.util.attention import VariableLengthMemoryLaye
 
 
 class CollaborativeMemoryNetwork(ModelBase):
+    popularity_array = None
 
     def __init__(self, config):
         """
@@ -50,6 +51,9 @@ class CollaborativeMemoryNetwork(ModelBase):
         """
         Construct the model; main part of it goes here
         """
+
+        self.popularity = tf.constant(CollaborativeMemoryNetwork.popularity_array)
+
         # our query = m_u + e_i
         query = (self._cur_user, self._cur_item)
         neg_query = (self._cur_user, self._cur_item_negative)
@@ -69,14 +73,13 @@ class CollaborativeMemoryNetwork(ModelBase):
                                             self.user_output(self.input_neighborhoods_negative),
                                             self.input_neighborhood_lengths_negative,
                                             self.config.max_neighbors)[-1].output
-        negative_output = self._output_module(tf.concat(
+        self.negative_output = self._output_module(tf.concat(
             [self._cur_user * self._cur_item_negative, neighbor_negative], axis=1))
 
         # Loss and Optimizer
-        self.loss = LossLayer()(self.score, negative_output)
+        self.loss = LossLayer()(self.input_items, self.score, self.negative_output, self.popularity)
 
-        self._optimizer = OptimizerLayer(self.config.optimizer, clip=self.config.grad_clip,
-                                         params=self.config.optimizer_params)
+        self._optimizer = OptimizerLayer(self.config.optimizer, clip=self.config.grad_clip, params=self.config.optimizer_params)
         self.train = self._optimizer(self.loss)
 
         tf.add_to_collection(GraphKeys.PREDICTION, self.score)
