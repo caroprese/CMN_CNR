@@ -6,7 +6,6 @@ from Conferences.SIGIR.CMN_github.util.attention import VariableLengthMemoryLaye
 
 
 class CollaborativeMemoryNetwork(ModelBase):
-    popularity_array = None
 
     def __init__(self, config):
         """
@@ -52,8 +51,6 @@ class CollaborativeMemoryNetwork(ModelBase):
         Construct the model; main part of it goes here
         """
 
-        self.popularity = tf.constant(CollaborativeMemoryNetwork.popularity_array)
-
         # our query = m_u + e_i
         query = (self._cur_user, self._cur_item)
         neg_query = (self._cur_user, self._cur_item_negative)
@@ -77,7 +74,7 @@ class CollaborativeMemoryNetwork(ModelBase):
             [self._cur_user * self._cur_item_negative, neighbor_negative], axis=1))
 
         # Loss and Optimizer
-        self.loss = LossLayer()(self.input_items, self.score, self.negative_output, self.popularity)
+        self.loss = LossLayer()(self.input_items, self.score, self.negative_output, self.input_positive_items_popularity)
 
         self._optimizer = OptimizerLayer(self.config.optimizer, clip=self.config.grad_clip, params=self.config.optimizer_params)
         self.train = self._optimizer(self.loss)
@@ -88,6 +85,8 @@ class CollaborativeMemoryNetwork(ModelBase):
         """Create placeholders for our model"""
         self.input_users = tf.placeholder(tf.int32, [None], 'UserID')
         self.input_items = tf.placeholder(tf.int32, [None], 'ItemID')
+        self.input_positive_items_popularity = tf.placeholder(tf.float32, [None], 'PositiveItemsPopularity')
+
         self.input_items_negative = tf.placeholder(tf.int32, [None],
                                                    'NegativeItemID')
         self.input_neighborhoods = tf.placeholder(tf.int32, [None, None],

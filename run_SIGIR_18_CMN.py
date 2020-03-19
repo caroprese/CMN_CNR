@@ -58,17 +58,18 @@ def read_data_split_and_search_CMN(dataset_name):
 
     p = 20
 
+    popularity = get_popularity(URM_train)
+
     URM_train = URM_train[:p, :]
     URM_validation = URM_validation[:p, :]
     URM_test = URM_test[:p, :]
     URM_test_negative = URM_test_negative[:p, :]
 
-    popularity = get_popularity(URM_train)
+    # popularity = get_popularity(URM_train)
 
     print('Luciano > popularity of items reported in URM_train:\n', popularity)
 
-    CollaborativeMemoryNetwork.popularity_array = popularity
-    PairwiseGMF.popularity_array = popularity
+    CMN_RecommenderWrapper.popularity_array = popularity
 
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):

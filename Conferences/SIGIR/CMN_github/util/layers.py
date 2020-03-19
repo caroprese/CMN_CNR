@@ -9,10 +9,11 @@ import tensorflow as tf
 import sonnet as snt
 
 from .helper import GraphKeys, OPTIMIZER
+from math import *
 
 
 # def _bpr_loss(positive, negative, name=None, popularity=None):
-def _bpr_loss(items, positive, negative, popularity, name=None):
+def _bpr_loss(items, positive, negative, positive_items_popularity, name=None):
     r"""
     Pairwise Loss from Bayesian Personalized Ranking.
 
@@ -32,30 +33,21 @@ def _bpr_loss(items, positive, negative, popularity, name=None):
     :returns: mean loss
     """
 
-    with tf.name_scope(name, 'BPRLoss', [items, positive, negative, popularity]) as scope:
+    with tf.name_scope(name, 'BPRLoss', [items, positive, negative, positive_items_popularity]) as scope:
         # TODO Luciano: modificare loss
 
-        print('Luciano > The Popularity Array is now available in the Loss Layer!')
-        print('type(popularity):', type(popularity))
-        print('popularity.shape:', popularity.shape)
-        print('popularity:', popularity)
-        print('positive.shape:', positive.shape)
-        print('negative.shape:', negative.shape)
-
-        positive_items_popularity = tf.gather_nd(popularity, items)
-
-        '''
         alpha = 1
         sigma = 1
+        k = 1 / (sigma * sqrt(2 * pi))
 
-        
+        gamma = tf.tanh(alpha * positive_items_popularity) + \
+                k * tf.exp(-1 / (2 * (sigma ** 2)) * tf.square(positive_items_popularity))
+        # ========================
 
-        gamma = tf.tanh(alpha * popularity[popularity_tensor])
-        '''
         difference = positive - negative
         # Numerical stability
         eps = 1e-12
-        loss = -tf.log(tf.nn.sigmoid(difference) + eps)
+        loss = -tf.log(tf.nn.sigmoid(gamma * difference) + eps)
         return tf.reduce_mean(loss, name=scope)
 
 
@@ -73,7 +65,7 @@ class LossLayer(snt.AbstractModule):
         """
         super(LossLayer, self).__init__(name=name)
 
-    def _build(self, positive_items, positive_scores, negative_scores, popularity):
+    def _build(self, positive_items, positive_scores, negative_scores, positive_items_popularity):
         """
 
         :param positive_scores: predicted value
@@ -83,7 +75,7 @@ class LossLayer(snt.AbstractModule):
 
         graph_regularizers = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
 
-        self._loss = tf.squeeze(_bpr_loss(positive_items, positive_scores, negative_scores, popularity))
+        self._loss = tf.squeeze(_bpr_loss(positive_items, positive_scores, negative_scores, positive_items_popularity))
 
         self._regularization = None
         self._loss_no_regularization = self._loss
