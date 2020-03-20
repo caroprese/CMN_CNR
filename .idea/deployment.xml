@@ -5,7 +5,7 @@
       <paths name="dgx.icar.cnr.it">
         <serverdata>
           <mappings>
-            <mapping deploy="/tmp/pycharm_project_246" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/tmp/pycharm_project_246" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

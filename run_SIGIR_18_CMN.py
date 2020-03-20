@@ -68,14 +68,12 @@ def read_data_split_and_search_CMN(dataset_name):
     URM_test = dataset.URM_test.copy()
     URM_test_negative = dataset.URM_test_negative.copy()
 
-    p = 20
-
     popularity = get_popularity(URM_train)
-
-    URM_train = URM_train[:p, :]
-    URM_validation = URM_validation[:p, :]
-    URM_test = URM_test[:p, :]
-    URM_test_negative = URM_test_negative[:p, :]
+    # p = 20
+    # URM_train = URM_train[:p, :]
+    # URM_validation = URM_validation[:p, :]
+    # URM_test = URM_test[:p, :]
+    # URM_test_negative = URM_test_negative[:p, :]
 
     # popularity = get_popularity(URM_train)
 
