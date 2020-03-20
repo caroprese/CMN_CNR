@@ -28,7 +28,7 @@ from Utils.plot_popularity import plot_popularity_bias, save_popularity_statisti
 
 import tensorflow as tf
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 print('GPU:', tf.test.is_gpu_available())
 
 
