@@ -5,6 +5,8 @@ Created on 22/11/17
 
 @author: Maurizio Ferrari Dacrema
 """
+from sklearn.preprocessing import MinMaxScaler
+
 import CMN_parameters
 from Conferences.SIGIR.CMN_github.util.cmn import CollaborativeMemoryNetwork
 from Conferences.SIGIR.CMN_github.util.gmf import PairwiseGMF
@@ -69,6 +71,17 @@ def read_data_split_and_search_CMN(dataset_name):
     URM_test_negative = dataset.URM_test_negative.copy()
 
     popularity = get_popularity(URM_train)
+
+    min_value = np.min(popularity)
+    max_value = np.max(popularity)
+    gap = max_value - min_value
+
+    popularity = (popularity - min_value) / gap
+
+    print('Luciano > min:', min_value)
+    print('Luciano > max:', max_value)
+    print('Luciano > normalized popularity:', popularity)
+
     # p = 20
     # URM_train = URM_train[:p, :]
     # URM_validation = URM_validation[:p, :]
