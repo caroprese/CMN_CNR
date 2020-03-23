@@ -273,3 +273,5 @@ if __name__ == '__main__':
                                  experiment_subfolder_list=dataset_list,
                                  ICM_names_to_report_list=[],
                                  other_algorithm_list=[CMN_RecommenderWrapper])
+
+    print('Luciano > Done!')
