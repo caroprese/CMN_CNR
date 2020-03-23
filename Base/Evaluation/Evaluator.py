@@ -295,6 +295,7 @@ class EvaluatorHoldout(Evaluator):
                     results_current_cutoff = results_dict[cutoff]
 
                     is_relevant_current_cutoff = is_relevant[0:cutoff]
+
                     recommended_items_current_cutoff = recommended_items[0:cutoff]
 
                     results_current_cutoff[EvaluatorMetrics.ROC_AUC.value] += roc_auc(is_relevant_current_cutoff)
@@ -552,6 +553,14 @@ class EvaluatorNegativeItemSample(Evaluator):
             for cutoff in self.cutoff_list:
 
                 results_current_cutoff = results_dict[cutoff]
+
+                # Questo array e' fondamentale.
+                # Dato un utente, results_current_cutoff e' nella forma [0, 1, 0, 0, 0]
+                # La sua lunghezza e' pari al cutoff.
+                # Nell'esempio riportato, il vettore ci dice che l'oggetto
+                # raccomandato in seconda posizione e' un hit, cioe' e' presente nel test set.
+                # Attenzione pero'. Gli oggetti presi in esame sono quelli del test set piu' quelli negativi
+                # (che sappiamo non piacere all'utente).
 
                 is_relevant_current_cutoff = is_relevant[0:cutoff]
 
