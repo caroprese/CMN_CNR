@@ -539,9 +539,12 @@ class EvaluatorNegativeItemSample(Evaluator):
             pos_weighted_hits = np.zeros(len(recommended_items))
             pos_log_weighted_hits = np.zeros(len(recommended_items))
 
+            # es. recommended_items = [2, 7, 10, 70, 5464]
+            # es. is_relevant       = [0, 0,  1,  0,    0]
             for i in range(len(recommended_items)):
                 if is_relevant[i]:
                     weighted_hits[i] = 1 / (1 + popularity[recommended_items[i]])
+                    # es. weighted_hits = [1, 7, 10, 70, 5464]
                     pos_weighted_hits[i] = 1 / (1 + i + popularity[recommended_items[i]])
 
                     log_weighted_hits[i] = 1 / (1 + math.log(1 + popularity[recommended_items[i]]))

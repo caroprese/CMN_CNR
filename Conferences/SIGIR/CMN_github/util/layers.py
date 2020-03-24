@@ -39,17 +39,20 @@ def _bpr_loss(items, positive, negative, positive_items_popularity, name=None):
     with tf.name_scope(name, 'BPRLoss', [items, positive, negative, positive_items_popularity]) as scope:
         # Modified loss =======================================================
         alpha = CMN_parameters.alpha
-        sigma = CMN_parameters.sigma
+        beta = CMN_parameters.beta
         percentile = CMN_parameters.percentile
 
         # print('Luciano > alpha:', alpha)
         # print('Luciano > sigma:', sigma)
         # print('Luciano > percentile:', percentile)
 
-        f = 1 / (sigma * sqrt(2 * pi))
+        f = 1 / (beta * sqrt(2 * pi))
 
-        gamma = tf.tanh(alpha * positive_items_popularity) + \
-                f * tf.exp(-1 / (2 * (sigma ** 2)) * tf.square(positive_items_popularity - percentile))
+        new_loss = True
+
+        gamma = 1
+        if new_loss:
+            gamma = tf.tanh(alpha * positive_items_popularity) + f * tf.exp(-1 / (2 * (beta ** 2)) * tf.square(positive_items_popularity - percentile))
 
         difference = positive - negative
         # Numerical stability

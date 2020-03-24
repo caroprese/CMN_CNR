@@ -94,7 +94,7 @@ def read_data_split_and_search_CMN(dataset_name):
 
     CMN_parameters.popularity_array = popularity
     CMN_parameters.alpha = 1
-    CMN_parameters.sigma = 1
+    CMN_parameters.beta = 1
     CMN_parameters.percentile = get_percentile(CMN_parameters.popularity_array, 80)
 
     # If directory does not exist, create
@@ -111,7 +111,9 @@ def read_data_split_and_search_CMN(dataset_name):
     ]
 
     # metric_to_optimize = "WEIGHTED_HIT_RATE"
-    metric_to_optimize = "HIT_RATE"
+    # metric_to_optimize = "HIT_RATE"
+    metric_to_optimize = "POS_WEIGHTED_HIT_RATE"
+
     print('metric_to_optimize:', metric_to_optimize)
 
     # Ensure IMPLICIT data and DISJOINT sets
@@ -164,8 +166,8 @@ def read_data_split_and_search_CMN(dataset_name):
 
         try:
 
-            # runParameterSearch_Collaborative_partial(recommender_class)
-            print('skipping', recommender_class)
+            runParameterSearch_Collaborative_partial(recommender_class)
+            # print('skipping', recommender_class)
 
         except Exception as e:
 
@@ -256,6 +258,8 @@ def read_data_split_and_search_CMN(dataset_name):
 
 
 if __name__ == '__main__':
+
+    print('Luciano > Experiment started!')
 
     ALGORITHM_NAME = "CMN"
     CONFERENCE_NAME = "SIGIR"

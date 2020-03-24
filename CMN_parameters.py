@@ -1,4 +1,4 @@
 popularity_array = None
 alpha = None
-sigma = None
+beta = None
 percentile = None
