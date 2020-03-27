@@ -581,15 +581,15 @@ class EvaluatorNegativeItemSample(Evaluator):
                 is_relevant_current_cutoff = is_relevant[0:cutoff]
 
                 # (CNR) -------------------------------------------------------
-                weighted_hits_current_cutoff = weighted_hits[0:cutoff]
-                log_weighted_hits_current_cutoff = log_weighted_hits[0:cutoff]
-                pos_weighted_hits_current_cutoff = pos_weighted_hits[0:cutoff]
-                pos_log_weighted_hits_current_cutoff = pos_log_weighted_hits[0:cutoff]
-
                 custom_hits = np.zeros(len(recommended_items))
                 for i in range(len(recommended_items)):
                     if is_relevant[i]:
                         custom_hits[i] = y_custom(Settings.popularity[recommended_items[i]], i, cutoff)
+
+                weighted_hits_current_cutoff = weighted_hits[0:cutoff]
+                log_weighted_hits_current_cutoff = log_weighted_hits[0:cutoff]
+                pos_weighted_hits_current_cutoff = pos_weighted_hits[0:cutoff]
+                pos_log_weighted_hits_current_cutoff = pos_log_weighted_hits[0:cutoff]
                 custom_hits_current_cutoff = custom_hits[0:cutoff]
                 # -------------------------------------------------------------
 

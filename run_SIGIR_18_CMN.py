@@ -7,6 +7,7 @@ Created on 22/11/17
 """
 from sklearn.preprocessing import MinMaxScaler
 
+from settings import *
 from settings import Settings, set_parameters
 from Conferences.SIGIR.CMN_github.util.cmn import CollaborativeMemoryNetwork
 from Conferences.SIGIR.CMN_github.util.gmf import PairwiseGMF
@@ -32,21 +33,6 @@ import tensorflow as tf
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 print('GPU:', tf.test.is_gpu_available())
-
-
-def get_popularity(matrix):
-    return matrix.A.sum(axis=0)
-
-
-def get_percentile(popularity_array, k):
-    # print('Luciano > popularity_array:', popularity_array)
-    sorted_popularity_array = np.sort(popularity_array)
-    index = int(round(popularity_array.shape[0] * k / 100))
-    # print('Luciano > len:', popularity_array.shape[0])
-    # print('Luciano > index:', index)
-    percentile = sorted_popularity_array[index]
-    # print('Luciano > percentile:', percentile)
-    return percentile
 
 
 def read_data_split_and_search_CMN(dataset_name):
@@ -121,7 +107,7 @@ def read_data_split_and_search_CMN(dataset_name):
 
     # metric_to_optimize = "WEIGHTED_HIT_RATE"
     # metric_to_optimize = "HIT_RATE"
-    metric_to_optimize = "POS_WEIGHTED_HIT_RATE"
+    metric_to_optimize = "CUSTOM_HIT_RATE"
 
     print('metric_to_optimize:', metric_to_optimize)
 

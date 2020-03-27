@@ -1,8 +1,13 @@
 import numpy as np
+from matplotlib import pyplot as plt, cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from mpl_toolkits.mplot3d import Axes3D
+
+from Conferences.SIGIR.CMN_our_interface.Pinterest.PinterestICCVReader import PinterestICCVReader
 
 
 class Settings:
-    popularity = None
+    x_1 = None
 
     loss_alpha: float = None
     loss_beta: float = None
@@ -15,6 +20,21 @@ class Settings:
     metrics_scale: float = None
     metrics_percentile: float = None
     max_y_aux_popularity: float = None
+
+
+def get_popularity(matrix):
+    return matrix.A.sum(axis=0)
+
+
+def get_percentile(popularity_array, k):
+    # print('Luciano > popularity_array:', popularity_array)
+    sorted_popularity_array = np.sort(popularity_array)
+    index = int(round(popularity_array.shape[0] * k / 100))
+    # print('Luciano > len:', popularity_array.shape[0])
+    # print('Luciano > index:', index)
+    percentile = sorted_popularity_array[index]
+    # print('Luciano > percentile:', percentile)
+    return percentile
 
 
 def set_parameters(
@@ -62,7 +82,7 @@ def y_popularity(x):
 
 
 def y_position(x, cutoff):
-    y = sigmoid(-(x / cutoff) * Settings.metrics_gamma) + 0.5
+    y = sigmoid(-x * Settings.metrics_gamma / cutoff) + 0.5
     return y
 
 
@@ -74,3 +94,70 @@ def sigmoid(x):
 def y_custom(popularity, position, cutoff):
     y = y_popularity(popularity) * y_position(position, cutoff)
     return y
+
+
+if __name__ == "__main__":
+    print("Testing settings")
+    dataset = PinterestICCVReader()
+
+    URM_train = dataset.URM_train.copy()
+
+    popularity = get_popularity(URM_train)
+
+    min_value = np.min(popularity)
+    max_value = np.max(popularity)
+    gap = max_value - min_value
+
+    popularity = (popularity - min_value) / gap
+
+    set_parameters(
+        popularity=popularity,
+        loss_alpha=200,
+        loss_beta=0.02,
+        loss_scale=1,
+        loss_percentile=get_percentile(popularity, 45),
+
+        metrics_alpha=100,
+        metrics_beta=0.03,
+        metrics_gamma=5,
+        metrics_scale=1 / 15,
+        metrics_percentile=0.45,
+    )
+
+    cutoff = 5
+    points = 1000
+
+    x_1 = np.linspace(0, 1, points)
+    x_2 = np.linspace(0, cutoff, points)
+
+    y_1 = y_popularity(x_1)
+    y_2 = y_position(x_2, cutoff)
+
+    plt.figure()
+    plt.plot(x_1, y_1)
+    plt.plot(x_2, y_2)
+    plt.xlim([0, 1])
+    plt.ylim([0, 1])
+
+    plt.show()
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+
+    # Make data.
+    x_1, x_2 = np.meshgrid(x_1, x_2)
+    z = y_custom(x_1, x_2, cutoff)
+
+    # Plot the surface.
+    surf = ax.plot_surface(x_1, x_2, z, cmap=cm.coolwarm,
+                           linewidth=0, antialiased=False)
+
+    # Customize the z axis.
+    ax.set_zlim(0, 1)
+    ax.zaxis.set_major_locator(LinearLocator(10))
+    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+
+    # Add a color bar which maps values to colors.
+    fig.colorbar(surf, shrink=0.5, aspect=2)
+
+    plt.show()
