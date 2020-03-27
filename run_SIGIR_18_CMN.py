@@ -7,7 +7,7 @@ Created on 22/11/17
 """
 from sklearn.preprocessing import MinMaxScaler
 
-import CMN_parameters
+from settings import Settings, set_parameters
 from Conferences.SIGIR.CMN_github.util.cmn import CollaborativeMemoryNetwork
 from Conferences.SIGIR.CMN_github.util.gmf import PairwiseGMF
 from Conferences.SIGIR.CMN_github.util.layers import LossLayer
@@ -92,10 +92,19 @@ def read_data_split_and_search_CMN(dataset_name):
 
     # print('Luciano > popularity of items reported in URM_train:\n', popularity)
 
-    CMN_parameters.popularity_array = popularity
-    CMN_parameters.alpha = 1
-    CMN_parameters.beta = 1
-    CMN_parameters.percentile = get_percentile(CMN_parameters.popularity_array, 80)
+    set_parameters(
+        popularity = popularity,
+        loss_alpha = 200,
+        loss_beta = 0.02,
+        loss_scale = 1,
+        loss_percentile = get_percentile(popularity, 45),
+
+        metrics_alpha = 100,
+        metrics_beta = 0.03,
+        metrics_gamma = 5,
+        metrics_scale = 1 / 15,
+        metrics_percentile = 0.45,
+    )
 
     # If directory does not exist, create
     if not os.path.exists(output_folder_path):

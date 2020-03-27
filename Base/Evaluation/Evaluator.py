@@ -6,18 +6,25 @@ Created on 26/06/18
 @author: Maurizio Ferrari Dacrema
 """
 
+import copy
+import math
+import sys
+import time
+from enum import Enum
+
 import numpy as np
 import scipy.sparse as sps
-import time, sys, copy
-
-from enum import Enum
-from Utils.seconds_to_biggest_unit import seconds_to_biggest_unit
-import math
 
 from Base.Evaluation.metrics import roc_auc, precision, precision_recall_min_denominator, recall, MAP, MRR, ndcg, arhr, \
     rmse, \
     Novelty, Coverage_Item, Metrics_Object, Coverage_User, Gini_Diversity, Shannon_Entropy, Diversity_MeanInterList, \
     Diversity_Herfindahl, AveragePopularity
+from Utils.seconds_to_biggest_unit import seconds_to_biggest_unit
+from settings import *
+
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
 
 
 class EvaluatorMetrics(Enum):
@@ -29,6 +36,8 @@ class EvaluatorMetrics(Enum):
 
     POS_WEIGHTED_HIT_RATE = "POS_WEIGHTED_HIT_RATE"
     POS_LOG_WEIGHTED_HIT_RATE = "POS_LOG_WEIGHTED_HIT_RATE"
+
+    CUSTOM_HIT_RATE = "CUSTOM_HIT_RATE"
     # -------------------------------------------------------
 
     ROC_AUC = "ROC_AUC"
@@ -110,7 +119,7 @@ def get_result_string(results_run, n_decimals=7):
 
         for metric in results_run_current_cutoff.keys():
             output_str += "{}: {:.{n_decimals}f},\n".format(metric, results_run_current_cutoff[metric],
-                                                           n_decimals=n_decimals)
+                                                            n_decimals=n_decimals)
 
         output_str += "\n"
 
@@ -472,9 +481,6 @@ class EvaluatorNegativeItemSample(Evaluator):
         :param URM_test_list: list of URMs to test the recommender against, or a single URM object
         :param cutoff_list: list of cutoffs to be use to report the scores, or a single cutoff
         """
-        # (CNR)
-        popularity = recommender_object.URM_train.A.sum(axis=0)
-
 
         results_dict = {}
 
@@ -539,6 +545,16 @@ class EvaluatorNegativeItemSample(Evaluator):
             pos_weighted_hits = np.zeros(len(recommended_items))
             pos_log_weighted_hits = np.zeros(len(recommended_items))
 
+            '''
+            alpha, beta, scale, pi = 100, 0.03, 1 / 15, np.pi
+            percentile = get_percentile(a, 45)
+
+            f = 1 / (beta * np.sqrt(2 * pi))
+
+            y_a = np.tanh(alpha * a) + scale * f * np.exp(-1 / (2 * (beta ** 2)) * (a - percentile) ** 2)
+            y_a = y_a / max(y_a)
+            '''
+
             # es. recommended_items = [2, 7, 10, 70, 5464]
             # es. is_relevant       = [0, 0,  1,  0,    0]
             for i in range(len(recommended_items)):
@@ -549,7 +565,7 @@ class EvaluatorNegativeItemSample(Evaluator):
 
                     log_weighted_hits[i] = 1 / (1 + math.log(1 + popularity[recommended_items[i]]))
                     pos_log_weighted_hits[i] = 1 / (1 + i + math.log(1 + popularity[recommended_items[i]]))
-            # -------------------------------------------------------
+                    # -------------------------------------------------------
 
             number_of_guessed_items = 0
 
@@ -567,12 +583,33 @@ class EvaluatorNegativeItemSample(Evaluator):
 
                 is_relevant_current_cutoff = is_relevant[0:cutoff]
 
-                # (CNR) -------------------------------------------------
+                # (CNR) -------------------------------------------------------
                 weighted_hits_current_cutoff = weighted_hits[0:cutoff]
                 log_weighted_hits_current_cutoff = log_weighted_hits[0:cutoff]
                 pos_weighted_hits_current_cutoff = pos_weighted_hits[0:cutoff]
                 pos_log_weighted_hits_current_cutoff = pos_log_weighted_hits[0:cutoff]
-                # -------------------------------------------------------
+
+                custom_hits = np.zeros(len(recommended_items))
+                for i in range(len(recommended_items)):
+                    if is_relevant[i]:
+                        # independent variables (a, b) ========================
+                        a = popularity[recommended_items[i]]
+                        b = i / cutoff
+
+                        # dependent variables (y_a, y_b) ======================
+                        f = 1 / (metrics_beta * np.sqrt(2 * np.pi))
+                        y_a = np.tanh(metrics_alpha * a) + \
+                              metrics_scale * f * np.exp(-1 / (2 * (metrics_beta ** 2)) * (a - metrics_percentile) ** 2)
+                        # TODO
+                        y_a = y_a / max(y_a)
+
+                        y_b = sigmoid(-b * metrics_gamma) + 0.5
+
+                        custom_hits[i] = y_a * y_b
+                        # -----------------------------------------------------
+                custom_hits_current_cutoff = custom_hits[0:cutoff]
+
+                # -------------------------------------------------------------
 
                 recommended_items_current_cutoff = recommended_items[0:cutoff]
 
@@ -596,6 +633,8 @@ class EvaluatorNegativeItemSample(Evaluator):
 
                 results_current_cutoff[EvaluatorMetrics.POS_WEIGHTED_HIT_RATE.value] += pos_weighted_hits_current_cutoff.sum()
                 results_current_cutoff[EvaluatorMetrics.POS_LOG_WEIGHTED_HIT_RATE.value] += pos_log_weighted_hits_current_cutoff.sum()
+
+                results_current_cutoff[EvaluatorMetrics.CUSTOM_HIT_RATE.value] += custom_hits_current_cutoff.sum()
                 # -------------------------------------------------------
 
                 results_current_cutoff[EvaluatorMetrics.ARHR.value] += arhr(is_relevant_current_cutoff)

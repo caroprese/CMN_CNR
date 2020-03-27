@@ -5,7 +5,7 @@ Created on 18/12/18
 
 @author: Maurizio Ferrari Dacrema
 """
-import CMN_parameters
+import settings
 from Base.BaseRecommender import BaseRecommender
 from Base.Incremental_Training_Early_Stopping import Incremental_Training_Early_Stopping
 
@@ -375,7 +375,7 @@ class CMN_RecommenderWrapper(BaseRecommender, Incremental_Training_Early_Stoppin
             feed = {
                 self.model.input_users: ratings[:, 0],
                 self.model.input_items: ratings[:, 1],
-                self.model.input_positive_items_popularity: CMN_parameters.popularity_array[ratings[:, 1]],
+                self.model.input_positive_items_popularity: settings.popularity[ratings[:, 1]],
                 self.model.input_items_negative: ratings[:, 2],
                 self.model.input_neighborhoods: pos_neighborhoods,
                 self.model.input_neighborhood_lengths: pos_neighborhood_length,
@@ -426,7 +426,7 @@ class CMN_RecommenderWrapper(BaseRecommender, Incremental_Training_Early_Stoppin
             feed = {
                 self.model.input_users: example[:, 0],
                 self.model.input_items: example[:, 1],
-                self.model.input_positive_items_popularity: CMN_parameters.popularity_array[example[:, 1]],
+                self.model.input_positive_items_popularity: settings.popularity[example[:, 1]],
                 self.model.input_items_negative: example[:, 2],
             }
             batch_loss, _ = self.sess.run([self.model.loss, self.model.train], feed)
