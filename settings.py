@@ -57,4 +57,20 @@ def y_aux_popularity(x):
 
 
 def y_popularity(x):
-    return y_aux_popularity(x) / Settings.max_y_aux_popularity
+    y = y_aux_popularity(x) / Settings.max_y_aux_popularity
+    return y
+
+
+def y_position(x, cutoff):
+    y = sigmoid(-(x / cutoff) * Settings.metrics_gamma) + 0.5
+    return y
+
+
+def sigmoid(x):
+    y = 1 / (1 + np.exp(-x))
+    return y
+
+
+def y_custom(popularity, position, cutoff):
+    y = y_popularity(popularity) * y_position(position, cutoff)
+    return y

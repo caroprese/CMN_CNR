@@ -93,17 +93,17 @@ def read_data_split_and_search_CMN(dataset_name):
     # print('Luciano > popularity of items reported in URM_train:\n', popularity)
 
     set_parameters(
-        popularity = popularity,
-        loss_alpha = 200,
-        loss_beta = 0.02,
-        loss_scale = 1,
-        loss_percentile = get_percentile(popularity, 45),
+        popularity=popularity,
+        loss_alpha=200,
+        loss_beta=0.02,
+        loss_scale=1,
+        loss_percentile=get_percentile(popularity, 45),
 
-        metrics_alpha = 100,
-        metrics_beta = 0.03,
-        metrics_gamma = 5,
-        metrics_scale = 1 / 15,
-        metrics_percentile = 0.45,
+        metrics_alpha=100,
+        metrics_beta=0.03,
+        metrics_gamma=5,
+        metrics_scale=1 / 15,
+        metrics_percentile=0.45,
     )
 
     # If directory does not exist, create

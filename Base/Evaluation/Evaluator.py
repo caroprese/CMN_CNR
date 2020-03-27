@@ -15,16 +15,13 @@ from enum import Enum
 import numpy as np
 import scipy.sparse as sps
 
+import settings
 from Base.Evaluation.metrics import roc_auc, precision, precision_recall_min_denominator, recall, MAP, MRR, ndcg, arhr, \
     rmse, \
     Novelty, Coverage_Item, Metrics_Object, Coverage_User, Gini_Diversity, Shannon_Entropy, Diversity_MeanInterList, \
     Diversity_Herfindahl, AveragePopularity
 from Utils.seconds_to_biggest_unit import seconds_to_biggest_unit
 from settings import *
-
-
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
 
 
 class EvaluatorMetrics(Enum):
@@ -559,12 +556,12 @@ class EvaluatorNegativeItemSample(Evaluator):
             # es. is_relevant       = [0, 0,  1,  0,    0]
             for i in range(len(recommended_items)):
                 if is_relevant[i]:
-                    weighted_hits[i] = 1 / (1 + popularity[recommended_items[i]])
+                    weighted_hits[i] = 1 / (1 + Settings.popularity[recommended_items[i]])
                     # es. weighted_hits = [1, 7, 10, 70, 5464]
-                    pos_weighted_hits[i] = 1 / (1 + i + popularity[recommended_items[i]])
+                    pos_weighted_hits[i] = 1 / (1 + i + Settings.popularity[recommended_items[i]])
 
-                    log_weighted_hits[i] = 1 / (1 + math.log(1 + popularity[recommended_items[i]]))
-                    pos_log_weighted_hits[i] = 1 / (1 + i + math.log(1 + popularity[recommended_items[i]]))
+                    log_weighted_hits[i] = 1 / (1 + math.log(1 + Settings.popularity[recommended_items[i]]))
+                    pos_log_weighted_hits[i] = 1 / (1 + i + math.log(1 + Settings.popularity[recommended_items[i]]))
                     # -------------------------------------------------------
 
             number_of_guessed_items = 0
@@ -592,23 +589,8 @@ class EvaluatorNegativeItemSample(Evaluator):
                 custom_hits = np.zeros(len(recommended_items))
                 for i in range(len(recommended_items)):
                     if is_relevant[i]:
-                        # independent variables (a, b) ========================
-                        a = popularity[recommended_items[i]]
-                        b = i / cutoff
-
-                        # dependent variables (y_a, y_b) ======================
-                        f = 1 / (metrics_beta * np.sqrt(2 * np.pi))
-                        y_a = np.tanh(metrics_alpha * a) + \
-                              metrics_scale * f * np.exp(-1 / (2 * (metrics_beta ** 2)) * (a - metrics_percentile) ** 2)
-                        # TODO
-                        y_a = y_a / max(y_a)
-
-                        y_b = sigmoid(-b * metrics_gamma) + 0.5
-
-                        custom_hits[i] = y_a * y_b
-                        # -----------------------------------------------------
+                        custom_hits[i] = y_custom(Settings.popularity[recommended_items[i]], i, cutoff)
                 custom_hits_current_cutoff = custom_hits[0:cutoff]
-
                 # -------------------------------------------------------------
 
                 recommended_items_current_cutoff = recommended_items[0:cutoff]

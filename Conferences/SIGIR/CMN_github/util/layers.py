@@ -10,7 +10,7 @@ from math import *
 import sonnet as snt
 import tensorflow as tf
 
-from settings import *
+from settings import Settings
 from .helper import GraphKeys, OPTIMIZER
 
 
@@ -37,10 +37,10 @@ def _bpr_loss(items, positive, negative, positive_items_popularity, name=None):
 
     with tf.name_scope(name, 'BPRLoss', [items, positive, negative, positive_items_popularity]) as scope:
         # Modified loss =======================================================
-        alpha = loss_alpha
-        beta = loss_beta
-        scale = loss_scale
-        percentile = loss_percentile
+        alpha = Settings.loss_alpha
+        beta = Settings.loss_beta
+        scale = Settings.loss_scale
+        percentile = Settings.loss_percentile
 
         # print('Luciano > alpha:', alpha)
         # print('Luciano > sigma:', sigma)
@@ -52,7 +52,8 @@ def _bpr_loss(items, positive, negative, positive_items_popularity, name=None):
 
         gamma = 1
         if new_loss:
-            gamma = tf.tanh(alpha * positive_items_popularity) + scale * f * tf.exp(-1 / (2 * (beta ** 2)) * tf.square(positive_items_popularity - percentile))
+            gamma = tf.tanh(alpha * positive_items_popularity) + \
+                    scale * f * tf.exp(-1 / (2 * (beta ** 2)) * tf.square(positive_items_popularity - percentile))
 
         difference = positive - negative
         # Numerical stability
