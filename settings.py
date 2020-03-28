@@ -7,7 +7,7 @@ from Conferences.SIGIR.CMN_our_interface.Pinterest.PinterestICCVReader import Pi
 
 
 class Settings:
-    x_1 = None
+    popularity = None
 
     loss_alpha: float = None
     loss_beta: float = None

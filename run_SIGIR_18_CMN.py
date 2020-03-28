@@ -56,6 +56,14 @@ def read_data_split_and_search_CMN(dataset_name):
     URM_test = dataset.URM_test.copy()
     URM_test_negative = dataset.URM_test_negative.copy()
 
+    test_mode = False
+    if test_mode:
+        p = 5
+        URM_train = URM_train[:p, :]
+        URM_validation = URM_validation[:p, :]
+        URM_test = URM_test[:p, :]
+        URM_test_negative = URM_test_negative[:p, :]
+
     popularity = get_popularity(URM_train)
 
     min_value = np.min(popularity)
@@ -67,16 +75,6 @@ def read_data_split_and_search_CMN(dataset_name):
     print('Luciano > min:', min_value)
     print('Luciano > max:', max_value)
     print('Luciano > normalized popularity:', popularity)
-
-    # p = 20
-    # URM_train = URM_train[:p, :]
-    # URM_validation = URM_validation[:p, :]
-    # URM_test = URM_test[:p, :]
-    # URM_test_negative = URM_test_negative[:p, :]
-
-    # popularity = get_popularity(URM_train)
-
-    # print('Luciano > popularity of items reported in URM_train:\n', popularity)
 
     set_parameters(
         popularity=popularity,

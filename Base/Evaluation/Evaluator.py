@@ -584,6 +584,7 @@ class EvaluatorNegativeItemSample(Evaluator):
                 custom_hits = np.zeros(len(recommended_items))
                 for i in range(len(recommended_items)):
                     if is_relevant[i]:
+                        # print('Luciano > Computing custom weight. Parameters (pop, pos, cutoff):', Settings.popularity[recommended_items[i]], i, cutoff)
                         custom_hits[i] = y_custom(Settings.popularity[recommended_items[i]], i, cutoff)
 
                 weighted_hits_current_cutoff = weighted_hits[0:cutoff]
