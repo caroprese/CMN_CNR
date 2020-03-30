@@ -582,10 +582,15 @@ class EvaluatorNegativeItemSample(Evaluator):
 
                 # (CNR) -------------------------------------------------------
                 custom_hits = np.zeros(len(recommended_items))
+
                 for i in range(len(recommended_items)):
                     if is_relevant[i]:
                         # print('Luciano > Computing custom weight. Parameters (pop, pos, cutoff):', Settings.popularity[recommended_items[i]], i, cutoff)
                         custom_hits[i] = y_custom(Settings.popularity[recommended_items[i]], i, cutoff)
+                        if custom_hits[i] > 1:
+                            print('==============================================================')
+                            print('Luciano > WARNING! custom_hits[{}]={}'.format(i, custom_hits[i]))
+                            print('==============================================================')
 
                 weighted_hits_current_cutoff = weighted_hits[0:cutoff]
                 log_weighted_hits_current_cutoff = log_weighted_hits[0:cutoff]
@@ -611,6 +616,18 @@ class EvaluatorNegativeItemSample(Evaluator):
                 results_current_cutoff[EvaluatorMetrics.HIT_RATE.value] += is_relevant_current_cutoff.sum()
 
                 # (CNR) -------------------------------------------------
+                verbose = False
+                if verbose and is_relevant_current_cutoff.sum() > 1:
+                    print('=============================================================================')
+                    print('user:', test_user)
+                    print('is_relevant_current_cutoff:', is_relevant_current_cutoff)
+                    print('recommended_items_current_cutoff:', recommended_items_current_cutoff)
+                    print('Warning! is_relevant_current_cutoff.sum()>1:', is_relevant_current_cutoff.sum())
+                    print('relevant_items:', relevant_items)
+                    print('relevant_items_rating:', relevant_items_rating)
+                    print('items_to_compute:', items_to_compute)
+                    print('=============================================================================')
+
                 results_current_cutoff[EvaluatorMetrics.WEIGHTED_HIT_RATE.value] += weighted_hits_current_cutoff.sum()
                 results_current_cutoff[EvaluatorMetrics.LOG_WEIGHTED_HIT_RATE.value] += log_weighted_hits_current_cutoff.sum()
 

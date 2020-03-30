@@ -6,7 +6,7 @@ import os
 # cutoff = 10
 # root = "result_experiments/KDD/CollaborativeVAE_citeulike_a_1"
 root = "result_experiments/SIGIR/CMN_pinterest"
-cutoff = 10
+cutoff = 5
 
 print_metrics_names = True
 

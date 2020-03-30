@@ -58,11 +58,39 @@ def read_data_split_and_search_CMN(dataset_name):
 
     test_mode = False
     if test_mode:
-        p = 5
+        p = 700
         URM_train = URM_train[:p, :]
         URM_validation = URM_validation[:p, :]
         URM_test = URM_test[:p, :]
         URM_test_negative = URM_test_negative[:p, :]
+
+        '''
+        user: 3
+        is_relevant_current_cutoff: [ True  True  True False False]
+        recommended_items_current_cutoff: [  65   86   68 3671 1341]
+        Warning! is_relevant_current_cutoff.sum()>1: 3
+        relevant_items: [65 68 81 86]
+        relevant_items_rating: [1. 1. 1. 1.]
+        items_to_compute: 
+        [  42   62   65   68   81   86  148  218  559  662  776  792 1164 1341
+         1418 1491 1593 1603 1617 1697 2140 2251 2446 2517 2566 2643 2719 2769
+         2771 3081 3133 3161 3188 3268 3409 3666 3671 3845 3864 3897 3984 4272
+         4327 4329 4431 4519 4565 4568 4718 4812 4915 5096 5128 5137 5141 5184
+         5217 5241 5371 5394 5415 5492 5521 5775 5798 5830 5831 5931 6005 6281
+         6375 6558 6638 6644 6661 6705 6881 6898 6939 6970 7010 7018 7147 7224
+         7327 7404 7453 7466 7475 7561 7764 8064 8102 8222 8368 8530 8957 9101
+         9322 9368 9619 9782 9832]
+        '''
+        print('USER 3')
+
+        print('test ', URM_test[3])
+        print('train ', URM_train[3])
+        print('valid ', URM_validation[3])
+        print('neg ', URM_test_negative[3])
+
+        # Durante l'esecuzione era stato notato un HR>1. Il motivo e' che veniva calcolato sul validation set (che per ogni utente ha
+        # piu' oggetti preferiti (non uno)
+        # Alla fine l'HR sara' minore o uguale ad uno perche' e' calcolato sul test set.
 
     popularity = get_popularity(URM_train)
 
@@ -136,7 +164,11 @@ def read_data_split_and_search_CMN(dataset_name):
     from Base.Evaluation.Evaluator import EvaluatorNegativeItemSample
 
     evaluator_validation = EvaluatorNegativeItemSample(URM_validation, URM_test_negative, cutoff_list=[5])
-    evaluator_test = EvaluatorNegativeItemSample(URM_test, URM_test_negative, cutoff_list=[5, 10])
+    if not test_mode:
+        #evaluator_test = EvaluatorNegativeItemSample(URM_test, URM_test_negative, cutoff_list=[5, 10])
+        evaluator_test = EvaluatorNegativeItemSample(URM_test, URM_test_negative, cutoff_list=[5])
+    else:
+        evaluator_test = EvaluatorNegativeItemSample(URM_test, URM_test_negative, cutoff_list=[5])
 
     runParameterSearch_Collaborative_partial = partial(runParameterSearch_Collaborative,
                                                        URM_train=URM_train,
@@ -158,9 +190,10 @@ def read_data_split_and_search_CMN(dataset_name):
     for recommender_class in collaborative_algorithm_list:
 
         try:
-
-            runParameterSearch_Collaborative_partial(recommender_class)
-            # print('skipping', recommender_class)
+            if not test_mode:
+                runParameterSearch_Collaborative_partial(recommender_class)
+            else:
+                print('skipping', recommender_class)
 
         except Exception as e:
 
@@ -240,14 +273,23 @@ def read_data_split_and_search_CMN(dataset_name):
                                       n_validation_users=n_validation_users,
                                       n_test_users=n_test_users,
                                       n_decimals=2)
-
-    print_results_latex_table(result_folder_path=output_folder_path,
-                              results_file_prefix_name=ALGORITHM_NAME,
-                              dataset_name=dataset_name,
-                              metrics_to_report_list=["HIT_RATE", "NDCG"],
-                              cutoffs_to_report_list=[5, 10],
-                              ICM_names_to_report_list=[],
-                              other_algorithm_list=[CMN_RecommenderWrapper])
+    if not test_mode:
+        print_results_latex_table(result_folder_path=output_folder_path,
+                                  results_file_prefix_name=ALGORITHM_NAME,
+                                  dataset_name=dataset_name,
+                                  metrics_to_report_list=["HIT_RATE", "NDCG"],
+                                  # cutoffs_to_report_list=[5, 10],
+                                  cutoffs_to_report_list=[5],
+                                  ICM_names_to_report_list=[],
+                                  other_algorithm_list=[CMN_RecommenderWrapper])
+    else:
+        print_results_latex_table(result_folder_path=output_folder_path,
+                                  results_file_prefix_name=ALGORITHM_NAME,
+                                  dataset_name=dataset_name,
+                                  metrics_to_report_list=["HIT_RATE", "NDCG"],
+                                  cutoffs_to_report_list=[5],
+                                  ICM_names_to_report_list=[],
+                                  other_algorithm_list=[CMN_RecommenderWrapper])
 
 
 if __name__ == '__main__':
