@@ -587,6 +587,7 @@ class EvaluatorNegativeItemSample(Evaluator):
                     if is_relevant[i]:
                         # print('Luciano > Computing custom weight. Parameters (pop, pos, cutoff):', Settings.popularity[recommended_items[i]], i, cutoff)
                         custom_hits[i] = y_custom(Settings.popularity[recommended_items[i]], i, cutoff)
+
                         if custom_hits[i] > 1:
                             print('==============================================================')
                             print('Luciano > WARNING! custom_hits[{}]={}'.format(i, custom_hits[i]))

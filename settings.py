@@ -69,6 +69,11 @@ def set_parameters(
     Settings.max_y_aux_popularity = max(codomain)
 
 
+def sigmoid(x):
+    y = 1 / (1 + np.exp(-x))
+    return y
+
+
 def y_aux_popularity(x):
     f = 1 / (Settings.metrics_beta * np.sqrt(2 * np.pi))
     y = np.tanh(Settings.metrics_alpha * x) + \
@@ -83,11 +88,6 @@ def y_popularity(x):
 
 def y_position(x, cutoff):
     y = sigmoid(-x * Settings.metrics_gamma / cutoff) + 0.5
-    return y
-
-
-def sigmoid(x):
-    y = 1 / (1 + np.exp(-x))
     return y
 
 
@@ -147,6 +147,8 @@ if __name__ == "__main__":
     # Make data.
     x_1, x_2 = np.meshgrid(x_1, x_2)
     z = y_custom(x_1, x_2, cutoff)
+    # print(z)
+    print('max_value:', np.max(z))
 
     # Plot the surface.
     surf = ax.plot_surface(x_1, x_2, z, cmap=cm.coolwarm,
