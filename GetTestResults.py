@@ -13,7 +13,13 @@ print_metrics_names = True
 table = {}
 table[0, 0] = 'Metrics@{}'.format(cutoff)
 column = 1
-selected_metrics = {'CUSTOM_HIT_RATE', 'HIT_RATE', 'NDCG'}
+selected_metrics = {'CUSTOM_HIT_RATE',
+                    'HIT_RATE', 'NDCG',
+                    'WEIGHTED_HIT_RATE',
+                    'POS_WEIGHTED_HIT_RATE',
+                    'LOG_WEIGHTED_HIT_RATE',
+                    'LOG_POS_WEIGHTED_HIT_RATE'
+                    }
 
 for file in os.listdir(root):
     if file.endswith("_metadata"):

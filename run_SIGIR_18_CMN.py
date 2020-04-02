@@ -57,7 +57,8 @@ def read_data_split_and_search_CMN(dataset_name):
     URM_test_negative = dataset.URM_test_negative.copy()
 
     test_mode = False
-    if test_mode:
+    limit = False
+    if limit:
         p = 700
         URM_train = URM_train[:p, :]
         URM_validation = URM_validation[:p, :]
@@ -116,6 +117,7 @@ def read_data_split_and_search_CMN(dataset_name):
         metrics_gamma=5,
         metrics_scale=1 / 15,
         metrics_percentile=0.45,
+        new_loss = False
     )
 
     # If directory does not exist, create
@@ -165,7 +167,7 @@ def read_data_split_and_search_CMN(dataset_name):
 
     evaluator_validation = EvaluatorNegativeItemSample(URM_validation, URM_test_negative, cutoff_list=[5])
     if not test_mode:
-        #evaluator_test = EvaluatorNegativeItemSample(URM_test, URM_test_negative, cutoff_list=[5, 10])
+        # evaluator_test = EvaluatorNegativeItemSample(URM_test, URM_test_negative, cutoff_list=[5, 10])
         evaluator_test = EvaluatorNegativeItemSample(URM_test, URM_test_negative, cutoff_list=[5])
     else:
         evaluator_test = EvaluatorNegativeItemSample(URM_test, URM_test_negative, cutoff_list=[5])

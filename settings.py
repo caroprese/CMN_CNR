@@ -21,6 +21,8 @@ class Settings:
     metrics_percentile: float = None
     max_y_aux_popularity: float = None
 
+    new_loss = False
+
 
 def get_popularity(matrix):
     return matrix.A.sum(axis=0)
@@ -49,7 +51,8 @@ def set_parameters(
         metrics_beta,
         metrics_gamma,
         metrics_scale,
-        metrics_percentile
+        metrics_percentile,
+        new_loss
 ):
     Settings.popularity = popularity
 
@@ -64,9 +67,25 @@ def set_parameters(
     Settings.metrics_scale = metrics_scale
     Settings.metrics_percentile = metrics_percentile
 
+    Settings.new_loss = new_loss
+
     domain = np.linspace(0, 1, 1000)
     codomain = [y_aux_popularity(x) for x in domain]
     Settings.max_y_aux_popularity = max(codomain)
+
+    print('SETTINGS -------------------------------')
+    print('Settings.loss_alpha:', Settings.loss_alpha)
+    print('Settings.loss_beta:', Settings.loss_beta)
+    print('Settings.loss_scale:', Settings.loss_scale)
+    print('Settings.loss_percentile:', Settings.loss_percentile)
+
+    print('Settings.metrics_alpha:', Settings.metrics_alpha)
+    print('Settings.metrics_beta:', Settings.metrics_beta)
+    print('Settings.metrics_gamma:', Settings.metrics_gamma)
+    print('Settings.metrics_scale:', Settings.metrics_scale)
+    print('Settings.metrics_percentile:', Settings.metrics_percentile)
+
+    print('Settings.new_loss:', Settings.new_loss)
 
 
 def sigmoid(x):

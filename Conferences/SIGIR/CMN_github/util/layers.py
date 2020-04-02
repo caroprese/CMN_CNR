@@ -40,7 +40,7 @@ def _bpr_loss(items, positive, negative, positive_items_popularity, name=None):
         f = 1 / (Settings.loss_beta * sqrt(2 * pi))
 
         gamma = 1
-        new_loss = True
+        new_loss = Settings.new_loss
 
         if new_loss:
             gamma = tf.tanh(Settings.loss_alpha * positive_items_popularity) + \
