@@ -117,7 +117,7 @@ def read_data_split_and_search_CMN(dataset_name):
         metrics_gamma=5,
         metrics_scale=1 / 15,
         metrics_percentile=0.45,
-        new_loss = False
+        new_loss=False
     )
 
     # If directory does not exist, create
