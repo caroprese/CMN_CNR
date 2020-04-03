@@ -117,6 +117,7 @@ def y_custom(popularity, position, cutoff):
 
 if __name__ == "__main__":
     print("Testing settings")
+
     dataset = PinterestICCVReader()
 
     URM_train = dataset.URM_train.copy()
@@ -141,7 +142,18 @@ if __name__ == "__main__":
         metrics_gamma=5,
         metrics_scale=1 / 15,
         metrics_percentile=0.45,
+        new_loss=False
     )
+
+    print('percentile 45:', get_percentile(popularity, 45))
+    print('percentile 99:', get_percentile(popularity, 99))
+    print('percentile 1:', get_percentile(popularity, 1))
+    print('max pop:', np.max(popularity))
+    print('min pop:', np.min(popularity))
+    print('n. 99:', np.sum(popularity <= 0.4116222760290557))
+    print('n. 1:', np.sum(popularity > 0.4116222760290557))
+    print('len:', len(popularity))
+    print('check:', np.sum(popularity <= 0.4116222760290557) + np.sum(popularity > 0.4116222760290557))
 
     cutoff = 5
     points = 1000
@@ -170,8 +182,7 @@ if __name__ == "__main__":
     print('max_value:', np.max(z))
 
     # Plot the surface.
-    surf = ax.plot_surface(x_1, x_2, z, cmap=cm.coolwarm,
-                           linewidth=0, antialiased=False)
+    surf = ax.plot_surface(x_1, x_2, z, cmap=cm.coolwarm, linewidth=0, antialiased=False)
 
     # Customize the z axis.
     ax.set_zlim(0, 1)
