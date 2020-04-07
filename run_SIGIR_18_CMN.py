@@ -134,8 +134,8 @@ def read_data_split_and_search_CMN(dataset_name):
     ]
 
     # metric_to_optimize = "WEIGHTED_HIT_RATE"
-    # metric_to_optimize = "HIT_RATE"
-    metric_to_optimize = "CUSTOM_HIT_RATE"
+    metric_to_optimize = "HIT_RATE"
+    # metric_to_optimize = "CUSTOM_HIT_RATE"
 
     print('metric_to_optimize:', metric_to_optimize)
 
@@ -167,8 +167,7 @@ def read_data_split_and_search_CMN(dataset_name):
 
     evaluator_validation = EvaluatorNegativeItemSample(URM_validation, URM_test_negative, cutoff_list=[5])
     if not test_mode:
-        # evaluator_test = EvaluatorNegativeItemSample(URM_test, URM_test_negative, cutoff_list=[5, 10])
-        evaluator_test = EvaluatorNegativeItemSample(URM_test, URM_test_negative, cutoff_list=[5])
+        evaluator_test = EvaluatorNegativeItemSample(URM_test, URM_test_negative, cutoff_list=[5, 10])
     else:
         evaluator_test = EvaluatorNegativeItemSample(URM_test, URM_test_negative, cutoff_list=[5])
 
@@ -205,6 +204,30 @@ def read_data_split_and_search_CMN(dataset_name):
     ################################################################################################
     ###### CMN
 
+    '''
+    Parameters from original paper:
+    {
+      "batch_size": 128,
+      "decay_rate": 0.9,
+      "embed_size": 50,
+      "filename": "data/pinterest.npz",
+      "grad_clip": 5.0,
+      "hops": 2,
+      "item_count": "9916",
+      "l2": 0.1,
+      "learning_rate": 0.001,
+      "logdir": "result/004/",
+      "max_neighbors": 1586,
+      "neg_count": 4,
+      "optimizer": "rmsprop",
+      "optimizer_params": "{'momentum': 0.9, 'decay': 0.9}",
+      "pretrain": "pretrain/pinterest_e50.npz",
+      "save_directory": "result/004/",
+      "tol": 1e-05,
+      "user_count": "55187"
+    }
+    '''
+
     try:
 
         temp_file_folder = output_folder_path + "{}_log/".format(ALGORITHM_NAME)
@@ -232,7 +255,8 @@ def read_data_split_and_search_CMN(dataset_name):
             CMN_article_parameters["embed_size"] = 40
 
         elif dataset_name == "pinterest":
-            CMN_article_parameters["batch_size"] = 256
+            CMN_article_parameters["batch_size"] = 128
+            # CMN_article_parameters["batch_size"] = 256
             CMN_article_parameters["embed_size"] = 50
 
         CMN_earlystopping_parameters = {
@@ -280,8 +304,7 @@ def read_data_split_and_search_CMN(dataset_name):
                                   results_file_prefix_name=ALGORITHM_NAME,
                                   dataset_name=dataset_name,
                                   metrics_to_report_list=["HIT_RATE", "NDCG"],
-                                  # cutoffs_to_report_list=[5, 10],
-                                  cutoffs_to_report_list=[5],
+                                  cutoffs_to_report_list=[5, 10],
                                   ICM_names_to_report_list=[],
                                   other_algorithm_list=[CMN_RecommenderWrapper])
     else:
@@ -301,9 +324,9 @@ if __name__ == '__main__':
     ALGORITHM_NAME = "CMN"
     CONFERENCE_NAME = "SIGIR"
 
-    # dataset_list = ["citeulike", "pinterest", "epinions"]
+    dataset_list = ["citeulike", "pinterest", "epinions"]
     # dataset_list = ["citeulike"]
-    dataset_list = ["pinterest"]
+    # dataset_list = ["pinterest"]
     # dataset_list = ["epinions"]
 
     for dataset in dataset_list:
