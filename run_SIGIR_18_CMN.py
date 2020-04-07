@@ -240,7 +240,6 @@ def read_data_split_and_search_CMN(dataset_name):
             "reg_l2_cmn": 1e-1,
             "reg_l2_gmf": 1e-4,
             "pretrain": True,
-            # "pretrain": False,
             "learning_rate": 1e-3,
             "verbose": False,
             "temp_file_folder": temp_file_folder
